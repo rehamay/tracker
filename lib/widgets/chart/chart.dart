@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:tracker/model/expense.dart';
-import 'package:tracker/widgets/chart_bar.dart';
+import 'package:tracker/widgets/chart/chart_bar.dart';
 
 class Chart extends StatelessWidget {
   const Chart({super.key, required this.expenses});
