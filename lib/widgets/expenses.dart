@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tracker/widgets/chart.dart';
+import 'package:tracker/widgets/chart/chart.dart';
 import 'package:tracker/widgets/expenses_list/expenses_list.dart';
 import 'package:tracker/model/expense.dart';
 import 'package:tracker/widgets/new_expense.dart';
@@ -14,7 +14,7 @@ class Expenses extends StatefulWidget {
 }
 
 class _ExpensesState extends State<Expenses> {
-  final List<Expense> _registeredexpenses = [
+  final List<Expense> _registeredExpenses = [
     Expense(
         title: "flutter",
         amount: 19.99,
@@ -29,6 +29,8 @@ class _ExpensesState extends State<Expenses> {
 
   void _openAddExpensesOverlay() {
     showModalBottomSheet(
+        useSafeArea:
+            true, // make sure that the camera doesn't overlay my sheet modal and flutter take note where is the camera and will adjust height
         context: context,
         isScrollControlled: true,
         builder: (ctx) => NewExpense(onAddExpense: _addExpense));
@@ -36,14 +38,14 @@ class _ExpensesState extends State<Expenses> {
 
   void _addExpense(Expense expense) {
     setState(() {
-      _registeredexpenses.add(expense);
+      _registeredExpenses.add(expense);
     });
   }
 
   void _removeExpense(Expense expense) {
-    final expenseIndex = _registeredexpenses.indexOf(expense);
+    final expenseIndex = _registeredExpenses.indexOf(expense);
     setState(() {
-      _registeredexpenses.remove(expense);
+      _registeredExpenses.remove(expense);
     });
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       duration: const Duration(seconds: 3),
@@ -52,7 +54,7 @@ class _ExpensesState extends State<Expenses> {
         label: 'Undo',
         onPressed: () {
           setState(() {
-            _registeredexpenses.insert(expenseIndex, expense);
+            _registeredExpenses.insert(expenseIndex, expense);
           });
         },
       ),
@@ -62,27 +64,44 @@ class _ExpensesState extends State<Expenses> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context)
+        .size
+        .width; // adjust my screen to be rotated and defferent size
+
     Widget mainContent = const Center(
       child: Text('no expenses found. Start adding some!'),
     );
-    if (_registeredexpenses.isNotEmpty) {
+    if (_registeredExpenses.isNotEmpty) {
       mainContent = ExpensesList(
-        expenses: _registeredexpenses,
+        expenses: _registeredExpenses,
         onRemoveExpense: _removeExpense,
       );
     }
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Flutter ExpenseTracker'),
-        actions: [
-          IconButton(
-              onPressed: _openAddExpensesOverlay, icon: const Icon(Icons.add))
-        ],
-      ),
-      body: Column(children: [
-        Chart(expenses: _registeredexpenses),
-        Expanded(child: mainContent),
-      ]),
-    );
+        appBar: AppBar(
+          title: const Text('Flutter ExpenseTracker'),
+          actions: [
+            IconButton(
+                onPressed: _openAddExpensesOverlay, icon: const Icon(Icons.add))
+          ],
+        ),
+        body: width < 600 // adjust my screen to be rotated and defferent size
+            ? Column(children: [
+                Chart(expenses: _registeredExpenses),
+                Expanded(
+                  child: mainContent,
+                ),
+              ])
+            : Row(
+                // adjust my screen to be rotated and defferent size
+                children: [
+                  Expanded(
+                    child: Chart(expenses: _registeredExpenses),
+                  ),
+                  Expanded(
+                    child: mainContent,
+                  ),
+                ],
+              ));
   }
 }
