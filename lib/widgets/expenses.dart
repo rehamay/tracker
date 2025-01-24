@@ -29,6 +29,8 @@ class _ExpensesState extends State<Expenses> {
 
   void _openAddExpensesOverlay() {
     showModalBottomSheet(
+        useSafeArea:
+            true, // make sure that the camera doesn't overlay my sheet modal and flutter take note where is the camera and will adjust height
         context: context,
         isScrollControlled: true,
         builder: (ctx) => NewExpense(onAddExpense: _addExpense));
